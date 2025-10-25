@@ -31,10 +31,17 @@ function createChatStore() {
 		setSessionId: (sessionId: string) =>
 			update((state) => ({ ...state, sessionId, isChatActive: true })),
 		addMessage: (message: ChatMessage) =>
-			update((state) => ({
-				...state,
-				messages: [...state.messages, message]
-			})),
+			update((state) => {
+				// Éviter les doublons : vérifier si le message existe déjà
+				const messageExists = state.messages.some((msg) => msg.id === message.id);
+				if (messageExists) {
+					return state;
+				}
+				return {
+					...state,
+					messages: [...state.messages, message]
+				};
+			}),
 		setTyping: (isTyping: boolean) => update((state) => ({ ...state, isTyping })),
 		setConnected: (isConnected: boolean) => update((state) => ({ ...state, isConnected })),
 		endChat: () =>

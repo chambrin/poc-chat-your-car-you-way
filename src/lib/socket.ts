@@ -7,7 +7,7 @@ export function initSocket() {
 	if (socket) return socket;
 
 	socket = io('http://localhost:3001', {
-		autoConnect: false
+		autoConnect: true
 	});
 
 	socket.on('connect', () => {

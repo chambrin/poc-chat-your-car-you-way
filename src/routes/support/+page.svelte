@@ -54,6 +54,20 @@
 		selectedSessionId = sessionId;
 		chatStore.reset();
 		chatStore.setSessionId(sessionId);
+
+		// Charger les messages existants de la session
+		const session = sessions.find((s) => s.id === sessionId);
+		if (session && session.messages) {
+			session.messages.forEach((msg) => {
+				chatStore.addMessage({
+					id: msg.id,
+					content: msg.content,
+					sentAt: new Date(msg.sentAt),
+					isFromSupport: msg.isFromSupport
+				});
+			});
+		}
+
 		joinChat(sessionId);
 	}
 
