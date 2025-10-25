@@ -1,0 +1,58 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                    String        @id @default(uuid()) @db.Uuid
+  email                 String        @unique
+  passwordHash          String        @map("password_hash")
+  firstName             String        @map("first_name")
+  lastName              String        @map("last_name")
+  birthDate             DateTime      @map("birth_date") @db.Date
+  phoneNumber           String        @map("phone_number")
+  drivingLicenseNumber  String        @map("driving_license_number")
+  licenseObtainedDate   DateTime      @map("license_obtained_date") @db.Date
+  street                String?
+  city                  String?
+  postalCode            String?       @map("postal_code")
+  country               String?
+  createdAt             DateTime      @default(now()) @map("created_at")
+  isEmailVerified       Boolean       @default(false) @map("is_email_verified")
+
+  chatSessions          ChatSession[]
+
+  @@map("USER")
+}
+
+model ChatSession {
+  id         String        @id @default(uuid()) @db.Uuid
+  userId     String        @map("user_id") @db.Uuid
+  startedAt  DateTime      @default(now()) @map("started_at")
+  endedAt    DateTime?     @map("ended_at")
+  status     String        // WAITING, ACTIVE, ENDED
+  transcript String?
+
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages   ChatMessage[]
+
+  @@map("CHAT_SESSION")
+}
+
+model ChatMessage {
+  id            String      @id @default(uuid()) @db.Uuid
+  chatSessionId String      @map("chat_session_id") @db.Uuid
+  content       String
+  sentAt        DateTime    @default(now()) @map("sent_at")
+  isFromSupport Boolean     @default(false) @map("is_from_support")
+
+  chatSession   ChatSession @relation(fields: [chatSessionId], references: [id], onDelete: Cascade)
+
+  @@map("CHAT_MESSAGE")
+}
