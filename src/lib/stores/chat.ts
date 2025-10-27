@@ -49,7 +49,16 @@ function createChatStore() {
 				...state,
 				isChatActive: false
 			})),
-		reset: () => set(initialState)
+		reset: () => set(initialState),
+		// Reset seulement les messages et l'état du chat, garde la connexion
+		resetChat: () =>
+			update((state) => ({
+				...state,
+				sessionId: null,
+				messages: [],
+				isTyping: false,
+				isChatActive: false
+			}))
 	};
 }
 

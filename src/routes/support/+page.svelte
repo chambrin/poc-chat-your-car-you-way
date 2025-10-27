@@ -52,12 +52,19 @@
 
 	function handleSelectSession(sessionId: string) {
 		selectedSessionId = sessionId;
-		chatStore.reset();
+
+		// Reset uniquement les messages
 		chatStore.setSessionId(sessionId);
 
 		// Charger les messages existants de la session
 		const session = sessions.find((s) => s.id === sessionId);
 		if (session && session.messages) {
+			// Vider d'abord les anciens messages
+			const currentState = $chatStore;
+			chatStore.reset();
+			chatStore.setConnected(currentState.isConnected);
+			chatStore.setSessionId(sessionId);
+
 			session.messages.forEach((msg) => {
 				chatStore.addMessage({
 					id: msg.id,
@@ -98,7 +105,9 @@
 		if (confirm('Voulez-vous vraiment terminer cette session de chat ?')) {
 			endChat(selectedSessionId);
 			selectedSessionId = null;
+			const currentState = $chatStore;
 			chatStore.reset();
+			chatStore.setConnected(currentState.isConnected);
 			loadSessions();
 		}
 	}
@@ -130,12 +139,6 @@
 				<h2 class="font-semibold text-lg">
 					Sessions actives ({sessions.length})
 				</h2>
-				<div class="flex items-center gap-2 mt-2">
-					<div class="w-2 h-2 rounded-full {chat.isConnected ? 'bg-green-500' : 'bg-red-500'}"></div>
-					<span class="text-sm text-gray-600">
-						{chat.isConnected ? 'Connecté' : 'Déconnecté'}
-					</span>
-				</div>
 			</div>
 
 			{#if sessions.length === 0}
