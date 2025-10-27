@@ -1,38 +1,83 @@
-# sv
+# PoC Chat - Your Car Your Way
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+Système de chat en temps réel entre clients et support.
 
-## Creating a project
+## Stack Technique
 
-If you're seeing this, you've probably already done this step. Congrats!
+- SvelteKit + TypeScript
+- Socket.io (temps réel)
+- PostgreSQL + Prisma
+- Bun
+- TailwindCSS
 
-```sh
-# create a new project in the current directory
-npx sv create
+## Installation
 
-# create a new project in my-app
-npx sv create my-app
+1. **Installer les dépendances**
+```bash
+bun install
 ```
 
-## Developing
+2. **Configurer la base de données**
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+Créer un fichier `.env` à la racine :
+```env
+DATABASE_URL="postgresql://user:password@host:port/database"
 ```
 
-## Building
-
-To create a production version of your app:
-
-```sh
-npm run build
+3. **Initialiser Prisma**
+```bash
+bunx prisma generate
+bunx prisma migrate dev
 ```
 
-You can preview the production build with `npm run preview`.
+4. **Créer un utilisateur de test**
+```bash
+bun run scripts/seed.ts
+```
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+Copier l'ID affiché et le coller dans `src/routes/+page.svelte` ligne 7.
+
+## Lancement
+
+**Ouvrir DEUX terminaux :**
+
+### Terminal 1 - Serveur Socket.io
+```bash
+bun run socket
+```
+
+### Terminal 2 - Application SvelteKit
+```bash
+bun run dev
+```
+
+## Utilisation
+
+- **Interface Client** : http://localhost:5173
+  - Démarrer un chat
+  - Envoyer des messages
+  - Voir l'indicateur "en train d'écrire..."
+  - Terminer le chat
+
+- **Interface Support** : http://localhost:5173/support
+  - Voir les sessions actives
+  - Sélectionner une session
+  - Répondre aux messages
+  - Terminer les conversations
+
+## Fonctionnalités
+
+✅ Chat en temps réel bidirectionnel
+✅ Messages persistés en base de données
+✅ Indicateur de frappe ("en train d'écrire...")
+✅ Gestion de plusieurs sessions simultanées
+✅ Historique des messages dans chaque session
+✅ Statuts des sessions (WAITING, ACTIVE, ENDED)
+
+## Test Rapide
+
+1. Ouvrir http://localhost:5173 (client)
+2. Ouvrir http://localhost:5173/support (support)
+3. Démarrer un chat côté client
+4. Sélectionner la session côté support
+5. Échanger des messages
